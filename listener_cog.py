@@ -11,7 +11,7 @@ class commands(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @app_commands.command(description="Ping the listener cog using a slash command.")
+    @app_commands.command(description="Ping the listener cog.")
     @app_commands.guilds(discord.Object(id="846538497087111169"))
     async def ping_listener(self, interaction:discord.Interaction):
         await interaction.response.send_message("Pong!", ephemeral=True)
@@ -60,12 +60,18 @@ class commands(commands.Cog):
             if word in message_check and channel != None:
                 # Formats differently depending on message length (Discord embeds have an ~250 character limit)
                 if len(message.content) < 250:
-                    embed=discord.Embed(title=":octagonal_sign: **Naughty Word Detected** :octagonal_sign:", description=f"{message.author.mention} in <#{channel}>", color=0xff0000)
-                    embed.add_field(name=f'"{message.content}"', value="‎")
-                    embed.set_footer(text="Powered by RLI", icon_url=f'https://cdn.discordapp.com/emojis/607596209254694913.png?v=1')
+                    embed=discord.Embed(title="Message Alert", description=f"{message.author.mention} in <#{channel}>", color=0xffbb00)
+                    embed.add_field(name=f'"{message.content}"', value=f"[Message Link]({message.jump_url})")
+                    embed.set_footer(text="", icon_url=f'https://cdn.discordapp.com/emojis/607596209254694913.png?v=1')
                     await mod_channel.send(embed=embed)
                 else:
-                    await mod_channel.send(f":octagonal_sign: **NAUGHTY WORD DETECTED** :octagonal_sign:\n\n{message.author.mention} in <#{channel}>:\n```{message.content}```")
+                    # If the message is close to the character limit, it is shortened to ensure it is always sent to the staff channel
+                    if len(message.content) > 1700:
+                        message_content = message.content[0:1700] + ("(Rest of message unavailable)")
+                    else:
+                        message_content = message.content
+
+                    await mod_channel.send(f"**Message Alert**\t||\tWord:   {word}\n\n{message.author.mention} in <#{channel}>\nLink: {message.jump_url}\n\n```{message_content}```")
 
 async def setup(bot):
     await bot.add_cog(commands(bot))

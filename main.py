@@ -46,7 +46,7 @@ async def reload(ctx, cog):
 async def ping(ctx):
     await ctx.send("Pong! (from a prefix command)")
 
-@tree.command(description="Ping the main script using a slash command.", guild=discord.Object(id=GUILD_ID))
+@tree.command(description="Ping the bot.", guild=discord.Object(id=GUILD_ID))
 async def ping_main(interaction:discord.Interaction):
     await interaction.response.send_message("Pong!", ephemeral=True)
 
