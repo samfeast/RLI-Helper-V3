@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 from discord import app_commands
+import asyncio
 from os import listdir
 import config
 
@@ -14,16 +15,6 @@ intents.message_content = True
 
 bot = commands.Bot(command_prefix=PREFIX, intents=intents)
 tree = bot.tree
-
-cogs = [f[:-3] for f in listdir() if "cog" == f[-6:-3]]
-print("Cogs:")
-for cog in cogs:
-    try:
-        bot.load_extension(cog)
-        print(f"\t{cog}")
-    except Exception as e:
-        print(f"Failed to load cog: {cog[:-4]}")
-        print(f"{type(e).__name__}: {e}")
 
 @bot.event
 async def on_ready():
@@ -45,4 +36,17 @@ async def ping(ctx):
 async def ding(interaction:discord.Interaction):
     await interaction.response.send_message("Dong! (from a slash command)", ephemeral=True)
 
-bot.run(TOKEN)
+async def main():
+    async with bot:
+        cogs = [f[:-3] for f in listdir() if "cog" == f[-6:-3]]
+        print("Cogs:")
+        for cog in cogs:
+            try:
+                await bot.load_extension("listener_cog")
+                print(f"\t{cog}")
+            except:
+                print(f"Failed to load cog: {cog[:-4]}")
+                print(f"{type(Exception).__name__}: {Exception}")
+        await bot.start(TOKEN)
+
+asyncio.run(main())
