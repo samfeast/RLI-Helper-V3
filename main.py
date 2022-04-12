@@ -1,6 +1,5 @@
 import discord
 from discord.ext import commands
-from discord import app_commands
 import asyncio
 from os import listdir
 import config
@@ -39,18 +38,17 @@ async def reload(ctx, cog):
     try:
         await bot.reload_extension(f"{cog.lower()}_cog")
         await ctx.send(f"{cog.capitalize()}_cog reloaded successfully.")
-    except:
+    except Exception as e:
         print(f"Failed to reload {cog}_cog")
-        print(f"{type(Exception).__name__}: {Exception}")
-
+        print(f"{type(e).__name__}: {e}")
 
 @bot.command()
 async def ping(ctx):
     await ctx.send("Pong! (from a prefix command)")
 
 @tree.command(description="Ping the main script using a slash command.", guild=discord.Object(id=GUILD_ID))
-async def ding(interaction:discord.Interaction):
-    await interaction.response.send_message("Dong! (from a slash command)", ephemeral=True)
+async def ping_main(interaction:discord.Interaction):
+    await interaction.response.send_message("Pong!", ephemeral=True)
 
 # New asynchronous way of running the bot and loading cogs in d.py 2.0
 async def main():
@@ -61,9 +59,9 @@ async def main():
             try:
                 await bot.load_extension("listener_cog")
                 print(f"\t{cog}")
-            except:
+            except Exception as e:
                 print(f"Failed to load {cog}")
-                print(f"{type(Exception).__name__}: {Exception}")
+                print(f"{type(e).__name__}: {e}")
         await bot.start(TOKEN)
 
 asyncio.run(main())

@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+from discord import app_commands
 import json
 
 # Imports list of words to listen for
@@ -10,11 +11,10 @@ class commands(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command()
-    async def bading(self, ctx):
-        embed=discord.Embed(title="Badong", color=0x0cdce2)
-        embed.set_footer(text="Inspired by cog")
-        await ctx.send(embed=embed)
+    @app_commands.command(description="Ping the listener cog using a slash command.")
+    @app_commands.guilds(discord.Object(id="846538497087111169"))
+    async def ping_listener(self, interaction:discord.Interaction):
+        await interaction.response.send_message("Pong!", ephemeral=True)
 
     # Adds a new term to watched_words.json in lowercase. Requires the cog to be reloaded so that the script re-imports the list
     @commands.command()
