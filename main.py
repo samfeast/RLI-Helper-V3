@@ -6,7 +6,9 @@ from os import listdir
 import config
 
 PREFIX = ">"
+# Imports bot token from config.py (so it's hidden on GitHub)
 TOKEN = config.TOKEN
+# Guild ID of server for slash commands to be registered in
 GUILD_ID = "846538497087111169"
 
 intents = discord.Intents.default()
@@ -14,6 +16,7 @@ intents.members = True
 intents.message_content = True
 
 bot = commands.Bot(command_prefix=PREFIX, intents=intents)
+# Initilises slash command tree
 tree = bot.tree
 
 @bot.event
@@ -23,10 +26,23 @@ async def on_ready():
     for guild in bot.guilds:
         print(f"\t{guild.name}")
 
+# Sync all slash commands to be used in the provided guild 
+# Only use when a new command is added, or the name/description of an existing command is changed
 @bot.command()
 async def synclocal(ctx):
     await tree.sync(guild=discord.Object(id=GUILD_ID))
     await ctx.send("Slash commands synced.")
+
+# Reloads a cog (cog argument does not need to contain _cog.py)
+@bot.command()
+async def reload(ctx, cog):
+    try:
+        await bot.reload_extension(f"{cog.lower()}_cog")
+        await ctx.send(f"{cog.capitalize()}_cog reloaded successfully.")
+    except:
+        print(f"Failed to reload {cog}_cog")
+        print(f"{type(Exception).__name__}: {Exception}")
+
 
 @bot.command()
 async def ping(ctx):
@@ -36,6 +52,7 @@ async def ping(ctx):
 async def ding(interaction:discord.Interaction):
     await interaction.response.send_message("Dong! (from a slash command)", ephemeral=True)
 
+# New asynchronous way of running the bot and loading cogs in d.py 2.0
 async def main():
     async with bot:
         cogs = [f[:-3] for f in listdir() if "cog" == f[-6:-3]]
@@ -45,7 +62,7 @@ async def main():
                 await bot.load_extension("listener_cog")
                 print(f"\t{cog}")
             except:
-                print(f"Failed to load cog: {cog[:-4]}")
+                print(f"Failed to load {cog}")
                 print(f"{type(Exception).__name__}: {Exception}")
         await bot.start(TOKEN)
 
