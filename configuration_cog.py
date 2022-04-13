@@ -46,11 +46,14 @@ class configuration(commands.Cog):
         else:
             await interaction.response.send_message("Word not found on the watchlist", ephemeral=True)
 
+    # Prints the watchlist
     @watchlist_group.command(description="Show the watchlist.")
     async def show(self, interaction: discord.Interaction):
         with open("json/watched_words.json", "r") as read_file:
             watchlist = json.load(read_file)
 
+        # .format is used as f-string formatting does not allow for backslashes
+        # .join joins all of the items in the list into a string separated by "\n"
         await interaction.response.send_message("```Use >reload listener to ensure this is up to date.\n\n{}```".format("\n".join(watchlist["list"])), ephemeral=True)
 
 async def setup(bot):
