@@ -4,9 +4,17 @@ from discord import app_commands
 import json
 from datetime import datetime, timezone
 
-# Imports watchlist of words to listen for
-with open("json/watched_words.json", "r") as read_file:
-    watched_word_list = json.load(read_file)
+# Imports config
+with open("json/config.json", "r") as read_file:
+    config = json.load(read_file)
+
+WATCHLIST = config["watchlist"]
+
+WELCOME_CHANNEL_ID = config["channels"]["welcome"]
+IMMIGRATION_CHANNEL_ID = config["channels"]["immigration"]
+EMMIGRATION_CHANNEL_ID = config["channels"]["emmigration"]
+WATCHLIST_ALERTS_CHANNEL_ID = config["channels"]["watchlist_alerts"]
+COMMENT_BOX_CHANNEL_ID = config["channels"]["comment_box"]
 
 class listener(commands.Cog):
     def __init__(self, bot):
@@ -26,7 +34,8 @@ class listener(commands.Cog):
             return
 
         # The channel that messages get sent to when a word on the watchlist is found
-        mod_channel = self.bot.get_channel(856899721170518016)
+        watchlist_alerts_channel = self.bot.get_channel(WATCHLIST_ALERTS_CHANNEL_ID)
+        comment_box_channel = self.bot.get_channel(COMMENT_BOX_CHANNEL_ID)
 
         # message.channel.name throws an error if the message is a direct message to the bot
         try:
@@ -35,14 +44,14 @@ class listener(commands.Cog):
 
         # If it is a direct message, it is sent directly to the staff channel
         except AttributeError:
-            await mod_channel.send(f"```{message.author.name} said: \n\n{message.content}```")
+            await comment_box_channel.send(f"```{message.author.name} said: \n\n{message.content}```")
             channel = None
         
         message_check = message.content.lower()
 
         # Checks to see if any of the watched words are included in the (lowercase) message
         # Also triggers with prefixes and suffixes (If "foo" is on the watchlist, "foo", "afoo", "foob", and "afoob" will trigger the bot)
-        for word in watched_word_list["list"]:
+        for word in WATCHLIST:
             # Doesn't send message to staff channel if it was in direct messages (they've already been sent)
             if word in message_check and channel != None:
                 # Formats differently depending on message length (Discord embeds have an ~250 character limit)
@@ -50,7 +59,7 @@ class listener(commands.Cog):
                     embed=discord.Embed(title="Message Alert", description=f"{message.author.mention} in <#{channel}>", color=0xffbb00)
                     embed.add_field(name=f'"{message.content}"', value=f"[Message Link]({message.jump_url})")
                     embed.set_footer(text="", icon_url=f'https://cdn.discordapp.com/emojis/607596209254694913.png?v=1')
-                    await mod_channel.send(embed=embed)
+                    await watchlist_alerts_channel.send(embed=embed)
                 else:
                     # If the message is close to the character limit, it is shortened to ensure it is always sent to the staff channel
                     if len(message.content) > 1700:
@@ -58,12 +67,13 @@ class listener(commands.Cog):
                     else:
                         message_content = message.content
 
-                    await mod_channel.send(f"**Message Alert**\t||\tWord:   {word}\n\n{message.author.mention} in <#{channel}>\nLink: {message.jump_url}\n\n```{message_content}```")
+                    await watchlist_alerts_channel.send(f"**Message Alert**\t||\tWord:   {word}\n\n{message.author.mention} in <#{channel}>\nLink: {message.jump_url}\n\n```{message_content}```")
 
     # Sends a message to an emmigration channel when a user leaves the server
     @commands.Cog.listener()
     async def on_member_remove(self, member):
-        emmigration_channel = self.bot.get_channel(856899721170518016)
+        emmigration_channel = self.bot.get_channel(EMMIGRATION_CHANNEL_ID)
+
         # Calculates the difference between the current time and the time the user joined
         delta = (datetime.now(timezone.utc) - member.joined_at)
 
@@ -78,8 +88,8 @@ class listener(commands.Cog):
         default_role = discord.utils.get(member.guild.roles, id=963825388621004890)
         await discord.Member.add_roles(member, default_role)
         
-        welcome_channel = self.bot.get_channel(871140765609365554)
-        immigration_channel = self.bot.get_channel(856899721170518016)
+        welcome_channel = self.bot.get_channel(WELCOME_CHANNEL_ID)
+        immigration_channel = self.bot.get_channel(IMMIGRATION_CHANNEL_ID)
 
         await welcome_channel.send("Welcome to **RL Ireland**")
 
@@ -88,7 +98,7 @@ class listener(commands.Cog):
         if delta.days == 1:
             await immigration_channel.send(f"{member.mention} has joined the server (Account created {delta.days} day ago)")
         else:
-            await immigration_channel.send(f"{member.mention} has left the server (Account created {delta.days} days ago)")
+            await immigration_channel.send(f"{member.mention} has joined the server (Account created {delta.days} days ago)")
         await member.send("Hey! Welcome to RL Ireland")        
 
 async def setup(bot):
