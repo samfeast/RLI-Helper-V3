@@ -8,7 +8,7 @@ PREFIX = ">"
 # Imports bot token from config.py (so it's hidden on GitHub)
 TOKEN = config.TOKEN
 # Guild ID of server for slash commands to be registered in
-GUILD_ID = "846538497087111169"
+GUILD_ID = 846538497087111169
 
 intents = discord.Intents.default()
 intents.members = True
@@ -57,7 +57,7 @@ async def main():
         print("Cogs:")
         for cog in cogs:
             try:
-                await bot.load_extension("listener_cog")
+                await bot.load_extension(cog)
                 print(f"\t{cog}")
             except Exception as e:
                 print(f"Failed to load {cog}")

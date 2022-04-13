@@ -7,28 +7,14 @@ import json
 with open("json/watched_words.json", "r") as read_file:
     watched_word_list = json.load(read_file)
 
-class commands(commands.Cog):
+class listener(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
     @app_commands.command(description="Ping the listener cog.")
-    @app_commands.guilds(discord.Object(id="846538497087111169"))
+    @app_commands.guilds(discord.Object(id=846538497087111169))
     async def ping_listener(self, interaction:discord.Interaction):
         await interaction.response.send_message("Pong!", ephemeral=True)
-
-    # Adds a new term to watched_words.json in lowercase. Requires the cog to be reloaded so that the script re-imports the list
-    @commands.command()
-    async def add_watched_word(self, ctx, word):
-        
-        with open("json/watched_words.json", "r") as read_file:
-            watched_words = json.load(read_file)
-
-        watched_words["list"].append(word.lower())
-
-        with open("json/watched_words.json", "w") as write_file:
-            json.dump(watched_words, write_file, indent=2)
-
-        await ctx.send(f'"{word}" has been added to the banned word list.\nUse >reload listener to commit changes.')
     
     # Scans all messages the bot can see to see if it contains any of the words in the banned list
     @commands.Cog.listener()
@@ -74,4 +60,4 @@ class commands(commands.Cog):
                     await mod_channel.send(f"**Message Alert**\t||\tWord:   {word}\n\n{message.author.mention} in <#{channel}>\nLink: {message.jump_url}\n\n```{message_content}```")
 
 async def setup(bot):
-    await bot.add_cog(commands(bot))
+    await bot.add_cog(listener(bot))
