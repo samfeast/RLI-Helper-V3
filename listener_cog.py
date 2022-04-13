@@ -72,5 +72,24 @@ class listener(commands.Cog):
         else:
             await emmigration_channel.send(f"{member.mention} has left the server (Last joined {delta.days} days ago)")
 
+    # When a member joins the server, they receive a default role, a direct message, and a message in the welcome channel
+    @commands.Cog.listener()
+    async def on_member_join(self, member):
+        default_role = discord.utils.get(member.guild.roles, id=963825388621004890)
+        await discord.Member.add_roles(member, default_role)
+        
+        welcome_channel = self.bot.get_channel(871140765609365554)
+        immigration_channel = self.bot.get_channel(856899721170518016)
+
+        await welcome_channel.send("Welcome to **RL Ireland**")
+
+        delta = (datetime.now(timezone.utc) - member.created_at)
+
+        if delta.days == 1:
+            await immigration_channel.send(f"{member.mention} has joined the server (Account created {delta.days} day ago)")
+        else:
+            await immigration_channel.send(f"{member.mention} has left the server (Account created {delta.days} days ago)")
+        await member.send("Hey! Welcome to RL Ireland")        
+
 async def setup(bot):
     await bot.add_cog(listener(bot))
