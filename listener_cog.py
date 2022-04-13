@@ -2,8 +2,9 @@ import discord
 from discord.ext import commands
 from discord import app_commands
 import json
+from datetime import datetime, timezone
 
-# Imports list of words to listen for
+# Imports watchlist of words to listen for
 with open("json/watched_words.json", "r") as read_file:
     watched_word_list = json.load(read_file)
 
@@ -16,7 +17,7 @@ class listener(commands.Cog):
     async def ping_listener(self, interaction:discord.Interaction):
         await interaction.response.send_message("Pong!", ephemeral=True)
     
-    # Scans all messages the bot can see to see if it contains any of the words in the banned list
+    # Scans all messages the bot can see to see if it contains any of the words on the watchlist
     @commands.Cog.listener()
     async def on_message(self, message):
 
@@ -24,7 +25,7 @@ class listener(commands.Cog):
         if message.author == self.bot.user:
             return
 
-        # The channel that messages get sent to when a watched word is found
+        # The channel that messages get sent to when a word on the watchlist is found
         mod_channel = self.bot.get_channel(856899721170518016)
 
         # message.channel.name throws an error if the message is a direct message to the bot
@@ -58,6 +59,18 @@ class listener(commands.Cog):
                         message_content = message.content
 
                     await mod_channel.send(f"**Message Alert**\t||\tWord:   {word}\n\n{message.author.mention} in <#{channel}>\nLink: {message.jump_url}\n\n```{message_content}```")
+
+    # Sends a message to an emmigration channel when a user leaves the server
+    @commands.Cog.listener()
+    async def on_member_remove(self, member):
+        emmigration_channel = self.bot.get_channel(856899721170518016)
+        # Calculates the difference between the current time and the time the user joined
+        delta = (datetime.now(timezone.utc) - member.joined_at)
+
+        if delta.days == 1:
+            await emmigration_channel.send(f"{member.mention} has left the server (Last joined {delta.days} day ago)")
+        else:
+            await emmigration_channel.send(f"{member.mention} has left the server (Last joined {delta.days} days ago)")
 
 async def setup(bot):
     await bot.add_cog(listener(bot))

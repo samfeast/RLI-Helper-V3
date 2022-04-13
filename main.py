@@ -25,7 +25,7 @@ async def on_ready():
     for guild in bot.guilds:
         print(f"\t{guild.name}")
 
-# Sync all slash commands to be used in the provided guild 
+# Sync all slash commands to be used in the provided server
 # Only use when a new command is added, or the name/description of an existing command is changed
 @bot.command()
 async def synclocal(ctx):
