@@ -1,10 +1,12 @@
 {
-  "watchlist": [],
+  "watchlist": [
+    "test"
+  ],
   "channels": {
-    "welcome": 963843264727883797,
+    "welcome": 871140765609365554,
     "immigration": 963843313981620285,
     "emmigration": 963843345807986690,
     "watchlist_alerts": 963843404305948753,
-    "comment_box": 963843382420058252
+    "community_comments": 963843382420058252
   }
 }

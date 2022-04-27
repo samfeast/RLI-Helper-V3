@@ -39,8 +39,20 @@ async def reload(ctx, cog):
         await bot.reload_extension(f"{cog.lower()}_cog")
         await ctx.send(f"{cog.capitalize()}_cog reloaded successfully.")
     except Exception as e:
-        print(f"Failed to reload {cog}_cog")
+        print(f"Failed to reload {cog}_cog. This isn't supposed to happen...")
         print(f"{type(e).__name__}: {e}")
+
+# Reloads all cogs
+@bot.command()
+async def reload_all(ctx):
+    cogs = [f[:-3] for f in listdir() if "cog" == f[-6:-3]]
+    for cog in cogs:
+        try:
+            await bot.reload_extension(cog)
+            await ctx.send(f"{cog.capitalize()} reloaded successfully.")
+        except Exception as e:
+            print(f"Failed to reload {cog}. This isn't supposed to happen...")
+            print(f"{type(e).__name__}: {e}")
 
 @bot.command()
 async def ping(ctx):

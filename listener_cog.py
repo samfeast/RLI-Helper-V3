@@ -14,7 +14,7 @@ WELCOME_CHANNEL_ID = config["channels"]["welcome"]
 IMMIGRATION_CHANNEL_ID = config["channels"]["immigration"]
 EMMIGRATION_CHANNEL_ID = config["channels"]["emmigration"]
 WATCHLIST_ALERTS_CHANNEL_ID = config["channels"]["watchlist_alerts"]
-COMMENT_BOX_CHANNEL_ID = config["channels"]["comment_box"]
+COMMUNITY_COMMENTS_CHANNEL_ID = config["channels"]["community_comments"]
 
 class listener(commands.Cog):
     def __init__(self, bot):
@@ -35,7 +35,7 @@ class listener(commands.Cog):
 
         # The channel that messages get sent to when a word on the watchlist is found
         watchlist_alerts_channel = self.bot.get_channel(WATCHLIST_ALERTS_CHANNEL_ID)
-        comment_box_channel = self.bot.get_channel(COMMENT_BOX_CHANNEL_ID)
+        community_comments_channel = self.bot.get_channel(COMMUNITY_COMMENTS_CHANNEL_ID)
 
         # message.channel.name throws an error if the message is a direct message to the bot
         try:
@@ -44,7 +44,7 @@ class listener(commands.Cog):
 
         # If it is a direct message, it is sent directly to the staff channel
         except AttributeError:
-            await comment_box_channel.send(f"```{message.author.name} said: \n\n{message.content}```")
+            await community_comments_channel.send(f"```{message.author.name} said: \n\n{message.content}```")
             channel = None
         
         message_check = message.content.lower()
