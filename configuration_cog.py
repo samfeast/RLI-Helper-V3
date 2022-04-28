@@ -22,7 +22,7 @@ class configuration(commands.Cog):
     )
 
     # Change the channel different sets of commands output to
-    @app_commands.command(description="Update bot-channel links.")
+    @app_commands.command(description="Update command-channel links.")
     @app_commands.guilds(discord.Object(id=846538497087111169))
     async def set_channel(
         self,
@@ -48,6 +48,31 @@ class configuration(commands.Cog):
 
         await interaction.response.send_message(
             f"{channel.mention} set as the {type.lower()} channel.\nUse >reload_all to commit changes.",
+            ephemeral=False,
+        )
+
+    # Prints the command-channel links
+    @app_commands.command(description="Display command-channel links.")
+    @app_commands.guilds(discord.Object(id=846538497087111169))
+    async def show_channel_links(
+        self,
+        interaction: discord.Interaction,
+    ):
+
+        with open("json/config.json", "r") as read_file:
+            config = json.load(read_file)
+
+        message = ""
+
+        for type in config["channels"]:
+            pretty_type = type.replace("_", " ")
+            command_channel_link = (
+                f"**{pretty_type.capitalize()}:**     <#{config['channels'][type]}>\n"
+            )
+            message += command_channel_link
+
+        await interaction.response.send_message(
+            message,
             ephemeral=False,
         )
 
