@@ -3,6 +3,7 @@ import discord
 from discord.ext import commands
 from discord import app_commands
 import json
+from typing import Literal
 
 class configuration(commands.Cog):
     def __init__(self, bot):
@@ -13,68 +14,24 @@ class configuration(commands.Cog):
     async def ping_configuration(self, interaction:discord.Interaction):
         await interaction.response.send_message("Pong!", ephemeral=True)
 
+    @app_commands.command(description="Update bot-channel links.")
+    @app_commands.guilds(discord.Object(id=846538497087111169))
+    async def set_channel(self, interaction:discord.Interaction, 
+    type: Literal["Welcome", "Immigration", "Emmigration", "Watchlist Alerts", "Community Comments"], 
+    channel: discord.channel.TextChannel):
+        command_type = type.lower().replace(" ", "_")
+        
+        with open("json/config.json", "r") as read_file:
+            config = json.load(read_file)
+
+        config["channels"][command_type] = channel.id
+
+        with open("json/config.json", "w") as write_file:
+            json.dump(config, write_file, indent=2)
+
+        await interaction.response.send_message(f"{channel.mention} set as the {type.lower()} channel.\nUse >reload_all to commit changes.", ephemeral=False)
+
     watchlist_group = app_commands.Group(name="watchlist", description="Watchlist commands", guild_ids=[846538497087111169])
-    set_channel_group = app_commands.Group(name="set_channel", description="Set channel commands", guild_ids=[846538497087111169])
-
-    @set_channel_group.command(description="Change the welcome channel ID.")
-    async def welcome(self, interaction: discord.Interaction, channel: discord.channel.TextChannel):
-        with open("json/config.json", "r") as read_file:
-            config = json.load(read_file)
-
-        config["channels"]["welcome"] = channel.id
-
-        with open("json/config.json", "w") as write_file:
-            json.dump(config, write_file, indent=2)
-
-        await interaction.response.send_message(f"{channel.mention} set as the welcome channel.\nUse >reload_all to commit changes.", ephemeral=False)
-
-    @set_channel_group.command(description="Change the immigration channel ID.")
-    async def immigration(self, interaction: discord.Interaction, channel: discord.channel.TextChannel):
-        with open("json/config.json", "r") as read_file:
-            config = json.load(read_file)
-
-        config["channels"]["welcome"] = channel.id
-
-        with open("json/config.json", "w") as write_file:
-            json.dump(config, write_file, indent=2)
-
-        await interaction.response.send_message(f"{channel.mention} set as the immigration channel.\nUse >reload_all to commit changes.", ephemeral=False)
-
-    @set_channel_group.command(description="Change the emmigration channel ID.")
-    async def emmigration(self, interaction: discord.Interaction, channel: discord.channel.TextChannel):
-        with open("json/config.json", "r") as read_file:
-            config = json.load(read_file)
-
-        config["channels"]["welcome"] = channel.id
-
-        with open("json/config.json", "w") as write_file:
-            json.dump(config, write_file, indent=2)
-
-        await interaction.response.send_message(f"{channel.mention} set as the emmigration channel.\nUse >reload_all to commit changes.", ephemeral=False)
-
-    @set_channel_group.command(description="Change the watchlist alerts channel ID.")
-    async def watchlist_alerts(self, interaction: discord.Interaction, channel: discord.channel.TextChannel):
-        with open("json/config.json", "r") as read_file:
-            config = json.load(read_file)
-
-        config["channels"]["welcome"] = channel.id
-
-        with open("json/config.json", "w") as write_file:
-            json.dump(config, write_file, indent=2)
-
-        await interaction.response.send_message(f"{channel.mention} set as the watchlist alerts channel.\nUse >reload_all to commit changes.", ephemeral=False)
-
-    @set_channel_group.command(description="Change the community comments channel ID.")
-    async def community_comments(self, interaction: discord.Interaction, channel: discord.channel.TextChannel):
-        with open("json/config.json", "r") as read_file:
-            config = json.load(read_file)
-
-        config["channels"]["welcome"] = channel.id
-
-        with open("json/config.json", "w") as write_file:
-            json.dump(config, write_file, indent=2)
-
-        await interaction.response.send_message(f"{channel.mention} set as the community comments channel.\nUse >reload_all to commit changes.", ephemeral=False)
 
     # Adds a new word to watched_words.json in lowercase. Requires the listener cog to be reloaded to commit changes
     @watchlist_group.command(description="Add a word to the watchlist.")
