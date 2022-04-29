@@ -8,5 +8,9 @@
     "emmigration": 963843345807986690,
     "watchlist_alerts": 963843404305948753,
     "community_comments": 963843382420058252
+  },
+  "roles": {
+    "default": "id",
+    "muted": 846768066339799070
   }
 }

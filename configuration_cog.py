@@ -21,8 +21,35 @@ class configuration(commands.Cog):
         guild_ids=[846538497087111169],
     )
 
-    # Change the channel different sets of commands output to
-    @app_commands.command(description="Update command-channel links.")
+    # Change the role given by the different sets of functions
+    @app_commands.command(description="Update command-role links.")
+    @app_commands.guilds(discord.Object(id=846538497087111169))
+    async def set_roles(
+        self,
+        interaction: discord.Interaction,
+        type: Literal[
+            "Default",
+            "Muted",
+        ],
+        role: discord.Role,
+    ):
+        command_type = type.lower().replace(" ", "_")
+
+        with open("json/config.json", "r") as read_file:
+            config = json.load(read_file)
+
+        config["roles"][command_type] = role.id
+
+        with open("json/config.json", "w") as write_file:
+            json.dump(config, write_file, indent=2)
+
+        await interaction.response.send_message(
+            f"{role.mention} set as the {type.lower()} role.\nUse >reload_all to commit changes.",
+            ephemeral=False,
+        )
+
+    # Change the channel different sets of functions output to
+    @app_commands.command(description="Update function-channel links.")
     @app_commands.guilds(discord.Object(id=846538497087111169))
     async def set_channel(
         self,
