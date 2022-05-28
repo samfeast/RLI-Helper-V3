@@ -15,6 +15,7 @@ IMMIGRATION_CHANNEL_ID = config["channels"]["immigration"]
 EMMIGRATION_CHANNEL_ID = config["channels"]["emmigration"]
 WATCHLIST_ALERTS_CHANNEL_ID = config["channels"]["watchlist_alerts"]
 COMMUNITY_COMMENTS_CHANNEL_ID = config["channels"]["community_comments"]
+DEFAULT_ROLE_ID = config["roles"]["default"]
 
 
 class listener(commands.Cog):
@@ -106,7 +107,7 @@ class listener(commands.Cog):
     # When a member joins the server, they receive a default role, a direct message, and a message in the welcome channel
     @commands.Cog.listener()
     async def on_member_join(self, member):
-        default_role = discord.utils.get(member.guild.roles, id=963825388621004890)
+        default_role = discord.utils.get(member.guild.roles, id=DEFAULT_ROLE_ID)
         await discord.Member.add_roles(member, default_role)
 
         welcome_channel = self.bot.get_channel(WELCOME_CHANNEL_ID)

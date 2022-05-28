@@ -16,7 +16,7 @@ class moderation(commands.Cog):
     async def ping_moderation(self, interaction: discord.Interaction):
         await interaction.response.send_message("Pong!", ephemeral=True)
 
-    @app_commands.command(description="Ping the moderation cog.")
+    @app_commands.command(description="Mute a user.")
     @app_commands.guilds(discord.Object(id=846538497087111169))
     async def mute(
         self,
